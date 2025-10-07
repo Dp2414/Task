@@ -8,20 +8,17 @@ const api = axios.create({
 });
 
 export default function App() {
-  // auth (client-side only; backend doesn't issue tokens)
   const [user, setUser] = useState(null); // { username }
   const [loginForm, setLoginForm] = useState({ username: "", password: "" });
   const [signupForm, setSignupForm] = useState({ username: "", password: "" });
   const [authErr, setAuthErr] = useState("");
   const [authMode, setAuthMode] = useState("login"); // 'login' | 'signup'
 
-  // tasks
   const [tasks, setTasks] = useState([]);
   const [taskForm, setTaskForm] = useState({ name: "", task: "" });
   const [taskErr, setTaskErr] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // load all tasks on mount
   useEffect(() => {
     fetchTasks();
   }, []);
@@ -69,7 +66,6 @@ export default function App() {
       const response = await api.post("/signup", { username, password });
       console.log("Signup response:", response.data);
       
-      // auto-fill login form after signup
       setLoginForm({ username, password: "" });
       setSignupForm({ username: "", password: "" });
       setAuthMode("login");
@@ -93,7 +89,6 @@ export default function App() {
       const { data } = await api.post("/login", loginForm);
       setUser({ username: data.username });
       setLoginForm({ username: "", password: "" });
-      // if logged in, default task name to username
       setTaskForm((f) => ({ ...f, name: data.username || "" }));
     } catch (e) {
       setAuthErr(e.response?.data?.error || "Login failed");
@@ -102,11 +97,9 @@ export default function App() {
 
   function handleLogout() {
     setUser(null);
-    // keep tasks visible; just clear the name if it was bound to user
     setTaskForm((f) => ({ ...f, name: "" }));
   }
 
-  // --- task handlers ---
   async function handleAddTask(e) {
     e.preventDefault();
     setTaskErr("");
@@ -135,7 +128,6 @@ export default function App() {
     if (!window.confirm("Are you sure you want to delete this task?")) return;
     try {
       setLoading(true);
-      // Note: Backend doesn't have delete endpoint, so we'll just remove from UI
       setTasks((prev) => prev.filter((t) => t._id !== taskId));
     } catch (e) {
       setTaskErr("Failed to delete task");

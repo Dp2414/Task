@@ -7,13 +7,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔹 Connect MongoDB (replace with your Mongo URI)
 mongoose
   .connect("mongodb+srv://dpdp8311:dpdp8311@cluster0.5ysqydm.mongodb.net/")
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Error:", err));
 
-// 🔹 Models
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
@@ -25,9 +23,7 @@ const taskSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 const Task = mongoose.model("Task", taskSchema);
 
-// 🔹 Routes
 
-// Register user
 app.post("/signup", async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password)
@@ -42,7 +38,6 @@ app.post("/signup", async (req, res) => {
   res.json({ message: "Signup successful" });
 });
 
-// Login
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   const user = await User.findOne({ username });
@@ -54,7 +49,6 @@ app.post("/login", async (req, res) => {
   res.json({ message: "Login successful", username: user.username });
 });
 
-// Add task
 app.post("/details", async (req, res) => {
   const { name, task } = req.body;
   const newTask = new Task({ name, task });
@@ -62,16 +56,13 @@ app.post("/details", async (req, res) => {
   res.json(newTask);
 });
 
-// Get all tasks
 app.get("/details", async (req, res) => {
   const tasks = await Task.find();
   res.json(tasks);
 });
 
-// Health check
 app.get("/health", (_, res) => res.json({ ok: true }));
 
-// Start server
 app.listen(8000, () =>
   console.log("🚀 Server running on http://localhost:8000")
 );
